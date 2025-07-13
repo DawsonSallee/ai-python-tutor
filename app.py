@@ -2,9 +2,10 @@ import streamlit as st
 import google.generativeai as genai
 import os
 import json
+from audio_follow_up import audio_follow_up_component
 
 # --- 1. SETUP AND CONFIGURATION (USER-PROVIDED KEY MODEL) ---
-st.set_page_config(page_title="The Python Sage", page_icon="🐍", layout="centered")
+st.set_page_config(page_title="The Python Sage", page_icon="🐍", layout="wide")
 
 @st.cache_data
 def load_tutorial_data():
@@ -234,7 +235,8 @@ st.sidebar.header("Your API Key")
 api_key = st.sidebar.text_input(
     "Enter your Google API Key:",
     type="password",
-    help="Get your free API key from Google AI Studio."
+    help="Get your free API key from Google AI Studio.",
+    key="api_key"  # <-- THIS IS THE CRITICAL ADDITION
 )
 # ===================================
 
@@ -281,65 +283,79 @@ comprehensive_mode = st.sidebar.checkbox(
 # The generate button (unchanged)
 generate_button = st.sidebar.button("✨ Generate My Quiz!", type="primary", use_container_width=True)
 
+# --- 4. THE DYNAMIC APPLICATION LOGIC (Two-Column Layout) ---
 
-# --- 4. THE DYNAMIC APPLICATION LOGIC ---
+# Define the columns at the top level
+main_col, follow_up_col = st.columns([1, 1]) # Main content is twice as wide as the follow-up
 
-if generate_button and selected_topic:
-
-    # === NEW: Check for API Key before doing anything ===
-    if not api_key:
-        st.error("🛑 Please enter your Google API Key in the sidebar to generate a quiz.")
-        st.stop()
-    # ======================================================
-    
-    # Logic for gathering content based on comprehensive mode (unchanged)
-    content_for_ai = ""
-    quiz_title = selected_topic
-    if not comprehensive_mode:
-        for item in library_data:
-            if item['topic'] == selected_topic:
-                content_for_ai = item['content']
-                break
-    else:
-        base_topic_number = selected_topic.split(' ')[0]
-        relevant_items = [item for item in library_data if item['topic'].startswith(base_topic_number)]
-        combined_content_parts = [f"### From section: {item['topic']}\n\n{item['content']}\n\n---\n" for item in relevant_items]
-        content_for_ai = "\n".join(combined_content_parts)
-        main_chapter_num_str = base_topic_number.split('.')[0]
-        main_chapter_entry = next((item for item in library_data if item['topic'].split(' ')[0] == f"{main_chapter_num_str}."), None)
-        if main_chapter_entry:
-            main_title_text = main_chapter_entry['topic'].split(' ', 1)[1]
-            quiz_title = f"Comprehensive Review: {main_title_text}"
+# --- MAIN COLUMN: Quiz Generator and Content ---
+with main_col:
+    if generate_button and selected_topic:
+        if not api_key:
+            st.error("🛑 Please enter your Google API Key in the sidebar.")
         else:
-            quiz_title = f"Comprehensive Review of Chapter {main_chapter_num_str}"
-
-    # --- NEW: Dynamically build the final prompt ---
-    if content_for_ai:
-        # 1. Get the chosen prompt template from the dictionary
-        prompt_template = PROMPT_TEMPLATES[selected_quiz_mode]
-
-        # 2. Get the chosen difficulty instructions from the dictionary
-        difficulty_instructions = DIFFICULTY_LEVELS[selected_difficulty]
-
-        # 3. Combine them into the final prompt
-        final_prompt = prompt_template.format(
-            difficulty_instructions=difficulty_instructions,
-            content=content_for_ai
-        )
-        
-        # --- The rest of the logic is the same ---
-        spinner_title = f"{selected_quiz_mode} ({selected_difficulty})"
-        with st.spinner(f"The Sage is crafting your '{spinner_title}' for: **{quiz_title}**..."):
             try:
                 genai.configure(api_key=api_key)
                 model = genai.GenerativeModel('gemini-2.5-flash')
-                response = model.generate_content(final_prompt)
-                st.header(f"{selected_quiz_mode}: {quiz_title}", divider="rainbow")
-                st.markdown(response.text)
-            except Exception as e:
-                st.error(f"An error occurred while generating the quiz: {e}")
-    else:
-        st.error("Could not find content for the selected topic.")
+                
+                # Store the chat session to maintain context
+                st.session_state.chat_session = model.start_chat()
+                
+                # Clear any previous follow-up response when generating a new quiz
+                if "follow_up_response" in st.session_state:
+                    del st.session_state.follow_up_response
+                
+                # Increment quiz count to reset the audio input widget
+                if 'quiz_count' not in st.session_state:
+                    st.session_state.quiz_count = 0
+                st.session_state.quiz_count += 1
 
-elif generate_button and not selected_topic:
-    st.warning("Please select a topic from the dropdown menu first.")
+                # --- Content Gathering and Prompting ---
+                content_for_ai = ""
+                if not comprehensive_mode:
+                    item = next((item for item in library_data if item['topic'] == selected_topic), None)
+                    if item: content_for_ai = item['content']
+                else:
+                    base_num = selected_topic.split(' ')[0]
+                    items = [item for item in library_data if item['topic'].startswith(base_num)]
+                    content_for_ai = "\n---\n".join([i['content'] for i in items])
+                
+                if content_for_ai:
+                    final_prompt = PROMPT_TEMPLATES[selected_quiz_mode].format(
+                        difficulty_instructions=DIFFICULTY_LEVELS[selected_difficulty],
+                        content=content_for_ai
+                    )
+                    with st.spinner(f"The Sage is crafting your quiz..."):
+                        response = st.session_state.chat_session.send_message(final_prompt)
+                        st.session_state.last_quiz_response = response.text # Store the quiz text
+                
+            except Exception as e:
+                st.error(f"An error occurred: {e}")
+
+    elif generate_button and not selected_topic:
+        st.warning("Please select a topic from the dropdown menu first.")
+
+    # --- Display Quiz Content or Welcome Message ---
+    if "last_quiz_response" in st.session_state:
+        st.header(f"Quiz Results", divider="rainbow")
+        st.markdown(st.session_state.last_quiz_response)
+    else:
+        if not api_key:
+            st.info("👋 Welcome! Please enter your Google API Key in the sidebar to get started.")
+        else:
+            st.info("✅ API Key received. Please select a topic and generate your first quiz!")
+
+
+# --- FOLLOW-UP COLUMN: Display for the follow-up answer ---
+with follow_up_col:
+    if "follow_up_response" in st.session_state and st.session_state.follow_up_response:
+        with st.container(border=True):
+            st.markdown("##### 💡 Follow-up Answer")
+            st.markdown(st.session_state.follow_up_response)
+            if st.button("Clear Answer"):
+                del st.session_state.follow_up_response
+                st.rerun()
+
+# --- SIDEBAR COMPONENT ---
+# This remains at the end to render the sidebar controls
+audio_follow_up_component()
