@@ -29,7 +29,7 @@ def audio_follow_up_component():
         audio_key = f"audio_recorder_{st.session_state.get('quiz_count', 0)}"
         
         st.audio_input( # <-- NO .sidebar
-            "Record a question about the content:",
+            "Record a question about the content to send to Gemini:",
             key=audio_key,
             on_change=set_process_audio_flag
         )

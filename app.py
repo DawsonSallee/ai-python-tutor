@@ -375,10 +375,9 @@ with follow_up_col:
                 st.rerun()
         else:
             # If there's no response, show the helper text.
-            st.markdown("##### 🤔 Ask a Follow-up")
             st.info(
                 "After generating a quiz, use the 'Ask a Follow-up' "
-                "recorder in the sidebar to ask a question about the content on the left. "
+                "recorder above to ask a question about the content on the left. "
                 "For best results, be specific! For example, you could ask:\n\n"
                 "- *\"Explain the code example for 'Automation of Tasks' in more detail.\"*\n"
                 "- *\"What is the difference between a list and a tuple based on this text?\"*"
