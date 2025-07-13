@@ -380,5 +380,12 @@ with follow_up_col:
                 "- *\"Explain the code example for 'Automation of Tasks' in more detail.\"*\n"
                 "- *\"What is the difference between a list and a tuple based on this text?\"*"
             )
+
+    st.link_button(
+        "☕ Buy the Sage a Coffee",
+        "https://www.buymeacoffee.com/DawsonSallee", 
+        use_container_width=True
+    )
+
 # This remains at the end to render the sidebar controls
 audio_follow_up_component()
