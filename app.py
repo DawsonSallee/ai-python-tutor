@@ -228,7 +228,7 @@ DIFFICULTY_LEVELS = {
 # --- 3. THE UPGRADED USER INTERFACE ---
 
 st.title("🐍 The Python Sage")
-st.caption("Your personal Python tutor, powered by the official documentation.")
+st.caption("Your personal Python tutor, powered by the [official Python documentation](https://docs.python.org/3/).")
 
 # === NEW SECTION: API KEY INPUT ===
 st.sidebar.header("Your API Key")
@@ -286,7 +286,7 @@ generate_button = st.sidebar.button("✨ Generate My Quiz!", type="primary", use
 # --- 4. THE DYNAMIC APPLICATION LOGIC (Two-Column Layout) ---
 
 # Define the columns at the top level
-main_col, follow_up_col = st.columns([1, 1]) # Main content is twice as wide as the follow-up
+main_col, follow_up_col = st.columns([1.5, 1]) # Main content is twice as wide as the follow-up
 
 # --- MAIN COLUMN: Quiz Generator and Content ---
 with main_col:
@@ -348,6 +348,10 @@ with main_col:
 
 # --- FOLLOW-UP COLUMN: Always-on with contextual help ---
 with follow_up_col:
+
+    # This remains at the end to render the sidebar controls
+    audio_follow_up_component()
+
     # The CSS injection for the sticky column remains the same.
     st.markdown("""
         <style>
@@ -386,6 +390,3 @@ with follow_up_col:
         "https://www.buymeacoffee.com/DawsonSallee", 
         use_container_width=True
     )
-
-# This remains at the end to render the sidebar controls
-audio_follow_up_component()

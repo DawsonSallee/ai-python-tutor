@@ -1,4 +1,4 @@
-# audio_follow_up.py (Corrected with the "Set a Flag" Callback Pattern)
+# audio_follow_up.py (NEW, GENERIC VERSION)
 
 import streamlit as st
 import google.generativeai as genai
@@ -22,31 +22,26 @@ def audio_follow_up_component():
     if "process_audio_flag" not in st.session_state:
         st.session_state.process_audio_flag = False
     
-    st.sidebar.divider()
-    st.sidebar.header("🗣️ Ask a Follow-up")
+    # --- UI Elements are now generic (no .sidebar) ---
+    st.subheader("🗣️ Ask a Follow-up") # Using subheader is better for a column
     
     if "chat_session" in st.session_state:
         audio_key = f"audio_recorder_{st.session_state.get('quiz_count', 0)}"
         
-        # The audio recorder now calls our new, fast callback function
-        st.sidebar.audio_input(
-            "Record a question about the quiz:",
+        st.audio_input( # <-- NO .sidebar
+            "Record a question about the content:",
             key=audio_key,
-            on_change=set_process_audio_flag  # <--- Using the fast callback
+            on_change=set_process_audio_flag
         )
     else:
-        st.sidebar.caption("Generate a quiz to enable follow-up questions.")
+        st.caption("Generate a quiz to enable follow-up questions.") # <-- NO .sidebar
 
-    # --- Processing Logic ---
-    # This now runs in the main script body, NOT in a callback.
-    # It checks the flag that was set by the fast callback.
+    # --- Processing Logic (This part is unchanged) ---
     if st.session_state.process_audio_flag:
-        # Immediately turn the flag off to prevent running this block again
         st.session_state.process_audio_flag = False
         
         api_key = st.session_state.get("api_key")
         chat_session = st.session_state.get("chat_session")
-        # Use the same key to retrieve the audio data
         audio_bytes_data = st.session_state.get(f"audio_recorder_{st.session_state.get('quiz_count', 0)}")
 
         if api_key and chat_session and audio_bytes_data:
@@ -69,5 +64,4 @@ def audio_follow_up_component():
                 except Exception as e:
                     st.session_state.follow_up_response = f"**An error occurred:**\n```\n{e}\n```"
             
-            # Rerun one last time to display the response and clear the visual part of the widget
             st.rerun()
