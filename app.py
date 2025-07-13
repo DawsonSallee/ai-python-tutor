@@ -228,10 +228,9 @@ DIFFICULTY_LEVELS = {
 # --- 3. THE UPGRADED USER INTERFACE ---
 
 st.title("🐍 The Python Sage")
-st.caption("Your personal Python tutor, powered by the [official Python documentation](https://docs.python.org/3/).")
+st.caption("Your personal Python tutor, powered by the [official Python documentation](https://docs.python.org/3/tutorial/index.html).")
 
 # === NEW SECTION: API KEY INPUT ===
-st.sidebar.header("Your API Key")
 api_key = st.sidebar.text_input(
     "Enter your Google API Key:",
     type="password",
