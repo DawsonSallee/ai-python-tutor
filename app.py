@@ -346,16 +346,39 @@ with main_col:
             st.info("✅ API Key received. Please select a topic and generate your first quiz!")
 
 
-# --- FOLLOW-UP COLUMN: Display for the follow-up answer ---
+# --- FOLLOW-UP COLUMN: Always-on with contextual help ---
 with follow_up_col:
-    if "follow_up_response" in st.session_state and st.session_state.follow_up_response:
-        with st.container(border=True):
+    # The CSS injection for the sticky column remains the same.
+    st.markdown("""
+        <style>
+            div[data-testid="stHorizontalBlock"] > div:nth-child(2) > div {
+                position: sticky;
+                top: 60px;
+                max-height: 80vh;
+                overflow-y: auto;
+            }
+        </style>
+        """, unsafe_allow_html=True)
+
+    # We now create the container unconditionally.
+    with st.container(border=True):
+        # Use an if/else to decide what content to show inside the container.
+        if "follow_up_response" in st.session_state and st.session_state.follow_up_response:
+            # If we have a response, show it.
             st.markdown("##### 💡 Follow-up Answer")
             st.markdown(st.session_state.follow_up_response)
             if st.button("Clear Answer"):
                 del st.session_state.follow_up_response
                 st.rerun()
-
-# --- SIDEBAR COMPONENT ---
+        else:
+            # If there's no response, show the helper text.
+            st.markdown("##### 🤔 Ask a Follow-up")
+            st.info(
+                "After generating a quiz, use the 'Ask a Follow-up' "
+                "recorder in the sidebar to ask a question about the content on the left. "
+                "For best results, be specific! For example, you could ask:\n\n"
+                "- *\"Explain the code example for 'Automation of Tasks' in more detail.\"*\n"
+                "- *\"What is the difference between a list and a tuple based on this text?\"*"
+            )
 # This remains at the end to render the sidebar controls
 audio_follow_up_component()

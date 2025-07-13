@@ -34,24 +34,35 @@ def audio_follow_up_component():
                 return
 
             with st.spinner("The Sage is thinking about your question..."):
+                # ... (inside audio_follow_up_component function) ...
                 try:
                     raw_audio_bytes = audio_bytes.getvalue()
                     audio_part = {"mime_type": "audio/wav", "data": raw_audio_bytes}
                     
-                    response = chat_session.send_message(["Your spoken question is:", audio_part])
+                    # --- THIS IS THE SPECIFIC CHANGE ---
+                    # We construct a multi-part message that includes a new instruction
+                    # for this specific turn in the conversation.
+                    
+                    follow_up_prompt = [
+                        "You are an expert Python tutor. A user is asking a follow-up question about the previous quiz content. "
+                        "Listen to their spoken question and provide a direct, clear, and concise answer. "
+                        "Base your answer ONLY on the context from the initial quiz. "
+                        "Keep your entire response under 150 words.",
+                        audio_part
+                    ]
+                    
+                    # Send the combined prompt and audio to the existing chat session
+                    response = chat_session.send_message(follow_up_prompt)
+                    # ------------------------------------
                     
                     st.session_state.follow_up_response = response.text
 
                 except Exception as e:
                     st.session_state.follow_up_response = f"**An error occurred:**\n```\n{e}\n```"
-            
-            # === THE CRUCIAL FIX ===
-            # After processing, we immediately clear the widget's state
-            # by setting its key in session_state to None.
-            st.session_state[audio_key] = None
-            # =======================
-
-            # Rerun to display the new response and show the cleared audio widget
-            st.rerun()
+                finally:
+                    # This block is GUARANTEED to run, even if an error occurs.
+                    # This ensures the widget is always cleared.
+                    st.session_state[audio_key] = None
+                    st.rerun()
     else:
         st.sidebar.caption("Generate a quiz to enable follow-up questions.")
