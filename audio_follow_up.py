@@ -1,61 +1,73 @@
-# audio_follow_up.py (Final, Correct Version using on_change Callback)
+# audio_follow_up.py (Corrected with the "Set a Flag" Callback Pattern)
 
 import streamlit as st
 import google.generativeai as genai
 import io
 import time
 
-def process_audio_follow_up():
+# --- This is the new, simple callback function. It is FAST. ---
+def set_process_audio_flag():
     """
-    This function is called automatically when new audio is recorded.
-    It handles the API call and stores the response in session state.
+    This callback's ONLY job is to set a flag in session_state, indicating
+    that there is new audio data ready to be processed.
     """
     audio_key = f"audio_recorder_{st.session_state.get('quiz_count', 0)}"
-    
-    # Check if there's audio data in the state from the widget
-    if audio_key in st.session_state and st.session_state[audio_key] is not None:
-        audio_bytes_data = st.session_state[audio_key]
-        
-        api_key = st.session_state.get("api_key")
-        chat_session = st.session_state.get("chat_session")
-
-        if not api_key or not chat_session:
-            st.sidebar.warning("API key and a generated quiz are required.")
-            return
-
-        with st.spinner("The Sage is thinking about your question..."):
-            try:
-                raw_audio_bytes = audio_bytes_data.getvalue()
-                audio_part = {"mime_type": "audio/wav", "data": raw_audio_bytes}
-                
-                follow_up_prompt = [
-                    "You are an expert Python tutor. A user is asking a follow-up question about the previous quiz content. "
-                    "Listen to their spoken question and provide a direct, clear, and concise answer. "
-                    "Base your answer ONLY on the context from the initial quiz. "
-                    "Keep your entire response under 150 words.",
-                    audio_part
-                ]
-                
-                response = chat_session.send_message(follow_up_prompt)
-                st.session_state.follow_up_response = response.text
-
-            except Exception as e:
-                st.session_state.follow_up_response = f"**An error occurred:**\n```\n{e}\n```"
-        
-        # We don't need to manually clear the state or rerun.
-        # Streamlit handles the rerun after the callback finishes.
+    if st.session_state[audio_key] is not None:
+        st.session_state.process_audio_flag = True
 
 def audio_follow_up_component():
-    """Renders the audio input widget in the sidebar."""
+    """Renders the audio input and handles the processing flow via a state flag."""
+
+    # Initialize the flag if it doesn't exist
+    if "process_audio_flag" not in st.session_state:
+        st.session_state.process_audio_flag = False
+    
     st.sidebar.divider()
     st.sidebar.header("🗣️ Ask a Follow-up")
     
     if "chat_session" in st.session_state:
-        # THE KEY CHANGE: We pass our function to the 'on_change' parameter.
+        audio_key = f"audio_recorder_{st.session_state.get('quiz_count', 0)}"
+        
+        # The audio recorder now calls our new, fast callback function
         st.sidebar.audio_input(
             "Record a question about the quiz:",
-            key=f"audio_recorder_{st.session_state.get('quiz_count', 0)}",
-            on_change=process_audio_follow_up # <--- THIS IS THE FIX
+            key=audio_key,
+            on_change=set_process_audio_flag  # <--- Using the fast callback
         )
     else:
         st.sidebar.caption("Generate a quiz to enable follow-up questions.")
+
+    # --- Processing Logic ---
+    # This now runs in the main script body, NOT in a callback.
+    # It checks the flag that was set by the fast callback.
+    if st.session_state.process_audio_flag:
+        # Immediately turn the flag off to prevent running this block again
+        st.session_state.process_audio_flag = False
+        
+        api_key = st.session_state.get("api_key")
+        chat_session = st.session_state.get("chat_session")
+        # Use the same key to retrieve the audio data
+        audio_bytes_data = st.session_state.get(f"audio_recorder_{st.session_state.get('quiz_count', 0)}")
+
+        if api_key and chat_session and audio_bytes_data:
+            with st.spinner("The Sage is thinking..."):
+                try:
+                    raw_audio_bytes = audio_bytes_data.getvalue()
+                    audio_part = {"mime_type": "audio/wav", "data": raw_audio_bytes}
+                    
+                    follow_up_prompt = [
+                        "You are an expert Python tutor. A user is asking a follow-up question about the previous quiz content. "
+                        "Listen to their spoken question and provide a direct, clear, and concise answer. "
+                        "Base your answer ONLY on the context from the initial quiz. "
+                        "Keep your entire response under 150 words.",
+                        audio_part
+                    ]
+                    
+                    response = chat_session.send_message(follow_up_prompt)
+                    st.session_state.follow_up_response = response.text
+
+                except Exception as e:
+                    st.session_state.follow_up_response = f"**An error occurred:**\n```\n{e}\n```"
+            
+            # Rerun one last time to display the response and clear the visual part of the widget
+            st.rerun()
