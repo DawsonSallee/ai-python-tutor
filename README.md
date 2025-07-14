@@ -22,7 +22,7 @@ The Python Sage is an interactive, AI-powered tutor designed to help users maste
 
 You can try the live application here:
 
-**[➡️ Launch The Python Sage](https://pythonsage.streamlit.app/))**
+**[➡️ Launch The Python Sage](https://pythonsage.streamlit.app/)**
 
 
 ## Project Structure
