@@ -360,18 +360,15 @@ with main_col:
     else:
         if not api_key:
             st.info("👋 Welcome! Please enter your Google API Key in the sidebar to get started.")
+            video_file_path = "python_sage_demo.mp4" 
+            
+            if os.path.exists(video_file_path):
+                st.video(video_file_path, autoplay=True, muted=True) # <--- ADDED: autoplay=True
+                st.markdown("*(Demo video showing the app in action)*")
+            else:
+                st.warning(f"Demo video file '{video_file_path}' not found. Please ensure it's in the same directory as app.py.")          
         else:
             st.info("✅ API Key received. Please select a topic and generate your first quiz!")
-
-        # --- IMPORTANT: Place your video file in the same directory as app.py ---
-        # For example, if your video is named 'python_sage_demo.mp4'
-        video_file_path = "python_sage_demo.mp4" 
-        
-        if os.path.exists(video_file_path):
-            st.video(video_file_path, autoplay=True, muted=True) # <--- ADDED: autoplay=True
-            st.markdown("*(Demo video showing the app in action)*")
-        else:
-            st.warning(f"Demo video file '{video_file_path}' not found. Please ensure it's in the same directory as app.py.")
         
 
 # --- FOLLOW-UP COLUMN: Always-on with contextual help ---
