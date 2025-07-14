@@ -368,7 +368,7 @@ with main_col:
         video_file_path = "python_sage_demo.mp4" 
         
         if os.path.exists(video_file_path):
-            st.video(video_file_path, autoplay=True) # <--- ADDED: autoplay=True
+            st.video(video_file_path, autoplay=True, muted=True) # <--- ADDED: autoplay=True
             st.markdown("*(Demo video showing the app in action)*")
         else:
             st.warning(f"Demo video file '{video_file_path}' not found. Please ensure it's in the same directory as app.py.")
