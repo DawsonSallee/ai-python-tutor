@@ -18,10 +18,11 @@ The Python Sage is an interactive, AI-powered tutor designed to help users maste
 -   **Secure and Private:** Your Google API key is processed exclusively in-session and is never stored or logged.
 -   **Slick, Responsive UI:** A clean, two-column layout with a sticky follow-up column for a seamless desktop experience. The UI intelligently adapts, hiding advanced features until an API key is provided.
 
-## Visual Demo
+## 🚀 Live Demo
 
-Here is a look at the application in action, showcasing the main interface after a quiz has been generated.
-[![Python Sage Demo Thumbnail](https://raw.githubusercontent.com/DawsonSallee/PythonForge_App/main/demo_thumbnail.png)](https://raw.githubusercontent.com/DawsonSallee/PythonForge_App/main/python_sage_demo.mp4)
+You can try the live application here:
+
+**[➡️ Launch The Python Sage]([https://your-app-url.streamlit.app](https://pythonsage.streamlit.app/))**
 
 
 ## Project Structure
