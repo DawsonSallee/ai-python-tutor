@@ -7,6 +7,25 @@ from audio_follow_up import audio_follow_up_component
 # --- 1. SETUP AND CONFIGURATION (USER-PROVIDED KEY MODEL) ---
 st.set_page_config(page_title="The Python Sage", page_icon="🐍", layout="wide")
 
+st.markdown("""
+    <style>          
+        .block-container {
+            padding-top: 0rem;
+            padding-bottom: 2rem;
+            padding-left: 2rem;
+            padding-right: 2rem;
+            max-width: 100%;
+        }
+                        
+        div[data-testid="stHorizontalBlock"] > div:nth-child(2) > div {
+            position: sticky;
+            top: 1px;
+            max-height: 99vh;
+            overflow-y: auto;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+
 @st.cache_data
 def load_tutorial_data():
     try:
@@ -285,7 +304,7 @@ generate_button = st.sidebar.button("✨ Generate My Quiz!", type="primary", use
 # --- 4. THE DYNAMIC APPLICATION LOGIC (Two-Column Layout) ---
 
 # Define the columns at the top level
-main_col, follow_up_col = st.columns([1.5, 1]) # Main content is twice as wide as the follow-up
+main_col, follow_up_col = st.columns([1.25, 1]) # Main content is twice as wide as the follow-up
 
 # --- MAIN COLUMN: Quiz Generator and Content ---
 with main_col:
@@ -351,24 +370,11 @@ with follow_up_col:
     # This remains at the end to render the sidebar controls
     audio_follow_up_component()
 
-    # The CSS injection for the sticky column remains the same.
-    st.markdown("""
-        <style>
-            div[data-testid="stHorizontalBlock"] > div:nth-child(2) > div {
-                position: sticky;
-                top: 60px;
-                max-height: 80vh;
-                overflow-y: auto;
-            }
-        </style>
-        """, unsafe_allow_html=True)
-
     # We now create the container unconditionally.
     with st.container(border=True):
         # Use an if/else to decide what content to show inside the container.
         if "follow_up_response" in st.session_state and st.session_state.follow_up_response:
             # If we have a response, show it.
-            st.markdown("##### 💡 Follow-up Answer")
             st.markdown(st.session_state.follow_up_response)
             if st.button("Clear Answer"):
                 del st.session_state.follow_up_response
