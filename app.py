@@ -355,7 +355,7 @@ with main_col:
 
     # --- Display Quiz Content or Welcome Message ---
     if "last_quiz_response" in st.session_state:
-        st.header(f"Quiz Results", divider="rainbow")
+        st.header(f"{selected_quiz_mode}: {selected_topic}", divider="rainbow")
         st.markdown(st.session_state.last_quiz_response)
     else:
         if not api_key:
@@ -363,6 +363,16 @@ with main_col:
         else:
             st.info("✅ API Key received. Please select a topic and generate your first quiz!")
 
+        # --- IMPORTANT: Place your video file in the same directory as app.py ---
+        # For example, if your video is named 'python_sage_demo.mp4'
+        video_file_path = "python_sage_demo.mp4" 
+        
+        if os.path.exists(video_file_path):
+            st.video(video_file_path, autoplay=True) # <--- ADDED: autoplay=True
+            st.markdown("*(Demo video showing the app in action)*")
+        else:
+            st.warning(f"Demo video file '{video_file_path}' not found. Please ensure it's in the same directory as app.py.")
+        
 
 # --- FOLLOW-UP COLUMN: Always-on with contextual help ---
 with follow_up_col:
