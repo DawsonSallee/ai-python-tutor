@@ -21,7 +21,7 @@ The Python Sage is an interactive, AI-powered tutor designed to help users maste
 ## Visual Demo
 
 Here is a look at the application in action, showcasing the main interface after a quiz has been generated.
-
+![Python Sage Demo](https://raw.githubusercontent.com/DawsonSallee/PythonForge_App/main/python_sage_demo.gif)
 
 
 ## Project Structure
