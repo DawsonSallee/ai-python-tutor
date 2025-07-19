@@ -53,7 +53,7 @@ def audio_follow_up_component():
                     follow_up_prompt = [
                         "You are an expert Python tutor. A user is asking a follow-up question about the previous quiz content. "
                         "Listen to their spoken question and provide a direct, clear, and concise answer. "
-                        "Base your answer ONLY on the context from the initial quiz. "
+                        "Base your answer primarily on the context provided. If the information requested is not present in the given context, you may then draw upon your general knowledge."
                         "Keep your entire response under 150 words.",
                         audio_part
                     ]
