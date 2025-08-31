@@ -18,7 +18,7 @@ The Python Sage is an interactive, AI-powered tutor designed to help users maste
 -   **Secure and Private:** Your Google API key is processed exclusively in-session and is never stored or logged.
 -   **Slick, Responsive UI:** A clean, two-column layout with a sticky follow-up column for a seamless desktop experience. The UI intelligently adapts, hiding advanced features until an API key is provided.
 
-## 🚀 Live Demo
+## Live Demo
 
 You can try the live application here:
 
@@ -41,7 +41,7 @@ The repository is organized to be simple and maintainable:
 
 ---
 
-## 🚀 Setup and Installation
+## Setup and Installation
 
 Follow these steps to get The Python Sage running on your local machine.
 
@@ -90,7 +90,7 @@ This application requires a Google API key to interact with the Gemini model.
 3.  Click on the **"Create API key in new project"** button.
 4.  Copy the generated key. You will paste this into the application's sidebar.
 
-## ▶️ Running the Application
+## Running the Application
 
 Once the setup is complete, run the following command in your terminal from the project's root directory:
 
@@ -102,7 +102,7 @@ Your web browser should automatically open with the application running.
 
 ---
 
-## 📖 How to Use the App
+## How to Use the App
 
 1.  **Enter Your API Key:** On the left sidebar, paste your Google API Key into the designated input field. The main application interface will appear.
 2.  **Select a Topic:** Choose a Python topic you want to learn about from the "Choose a topic" dropdown menu.
@@ -144,14 +144,14 @@ This ensures the `with follow_up_col:` block never causes an error, while provid
 
 The core logic resides in the `PROMPT_TEMPLATES` dictionary in `app.py`. Each key corresponds to a quiz mode and holds a detailed, structured prompt. These prompts instruct the Gemini model on its persona, task, constraints, and, most importantly, the **MANDATORY OUTPUT STRUCTURE**. This strict formatting ensures the AI's output is consistent and can be reliably rendered in the UI.
 
-## 🔒 Security
+## Security
 
 Security and user privacy are top priorities.
 -   **API Key Handling:** Your Google API key is **never stored** by the application. It is only held in the server's memory for the duration of your session and is immediately discarded when you close the browser tab. The input field is of `type="password"` to mask it from shoulder-surfers.
 -   **No Prompt Injection Risk:** The application's prompts are constructed from trusted, hard-coded templates and predefined user selections (dropdowns, sliders). Raw user text is not formatted into the prompts, mitigating the risk of prompt injection attacks.
 -   **Secure Configuration:** The `.gitignore` file is configured to explicitly ignore sensitive files, including virtual environments (`.venv`), environment variable files (`.env`), and Streamlit's secret management file (`.streamlit/secrets.toml`), preventing accidental credential exposure.
 
-## 🤝 How to Contribute
+## How to Contribute
 
 Contributions are welcome! If you have ideas for new features, find a bug, or want to improve the documentation, please feel free to:
 1.  Open an issue to discuss the change.
@@ -161,11 +161,7 @@ Contributions are welcome! If you have ideas for new features, find a bug, or wa
 5.  Push to the branch (`git push origin feature/AmazingFeature`).
 6.  Open a Pull Request.
 
-## 📜 License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
-
-## 🙏 Acknowledgments
+## Acknowledgments
 
 -   The tutorial content is based on the official [Python 3 Documentation](https://docs.python.org/3/tutorial/index.html).
 -   Built with the amazing [Streamlit](https://streamlit.io/) framework.
