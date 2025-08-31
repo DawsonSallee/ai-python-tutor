@@ -114,36 +114,6 @@ Your web browser should automatically open with the application running.
     -   Record your question about the content on the left.
     -   Stop the recording. The app will process your audio and display a text-based answer from the AI below the recorder.
 
-## 🛠️ Architectural Deep Dive
-
-### State Management (`st.session_state`)
-
-The application relies heavily on Streamlit's `st.session_state` to maintain persistence across user interactions and re-runs:
--   `st.session_state.api_key`: Stores the user-provided API key.
--   `st.session_state.chat_session`: Holds the active `genai.GenerativeModel.start_chat()` instance, allowing for contextual follow-up questions.
--   `st.session_state.last_quiz_response`: Caches the most recently generated quiz content.
--   `st.session_state.follow_up_response`: Stores the AI's answer to an audio follow-up question.
--   `st.session_state.quiz_count`: A counter used to create unique keys for the audio recorder widget, forcing it to reset when a new quiz is generated.
-
-### Conditional UI Layout
-
-The application uses a clever trick to hide the `follow_up_col` until an API key is provided. The `st.columns()` definition is wrapped in an `if/else` block:
-
-```python
-if api_key:
-    # When the key exists, create a balanced two-column layout
-    main_col, follow_up_col = st.columns([1.25, 1])
-else:
-    # When no key exists, create an extremely unbalanced layout
-    # This visually "hides" the follow_up_col by making it too narrow to see
-    main_col, follow_up_col = st.columns([100, 1])
-```
-This ensures the `with follow_up_col:` block never causes an error, while providing a clean welcome screen for new users.
-
-### Prompt Engineering
-
-The core logic resides in the `PROMPT_TEMPLATES` dictionary in `app.py`. Each key corresponds to a quiz mode and holds a detailed, structured prompt. These prompts instruct the Gemini model on its persona, task, constraints, and, most importantly, the **MANDATORY OUTPUT STRUCTURE**. This strict formatting ensures the AI's output is consistent and can be reliably rendered in the UI.
-
 ## Security
 
 Security and user privacy are top priorities.
